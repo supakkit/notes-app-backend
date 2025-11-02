@@ -2,14 +2,14 @@ import Note from "../models/note.model.js";
 
 export const createNote = async (req, res, next) => {
   const { title, content, tags = [] } = req.body;
-  const userId = "";
+  const userId = req.user._id;
 
-  // // Validate client's authorization
-  // if (!userId) {
-  //   const error = new Error("Unauthorized - no user ID found");
-  //   error.status = 401;
-  //   return next(error);
-  // }
+  // Validate client's authorization
+  if (!userId) {
+    const error = new Error("Unauthorized - no user ID found");
+    error.status = 401;
+    return next(error);
+  }
 
   // Validate client's input
   if (!title) {
@@ -38,7 +38,14 @@ export const createNote = async (req, res, next) => {
 };
 
 export const getUserNotes = async (req, res, next) => {
-  const userId = "";
+  const userId = req.user._id;
+
+  // Validate client's authorization
+  if (!userId) {
+    const error = new Error("Unauthorized - no user ID found");
+    error.status = 401;
+    return next(error);
+  }
 
   const page = Math.max(1, parseInt(req.query.page, 10) || 1);
   const limitRaw = parseInt(req.query.limit, 10) || 10;
@@ -80,7 +87,14 @@ export const getUserNotes = async (req, res, next) => {
 
 export const getNoteById = async (req, res, next) => {
   const { noteId } = req.params;
-  const userId = "";
+  const userId = req.user._id;
+
+  // Validate client's authorization
+  if (!userId) {
+    const error = new Error("Unauthorized - no user ID found");
+    error.status = 401;
+    return next(error);
+  }
 
   try {
     const note = await Note.findOne({ _id: noteId, userId: userId });
@@ -103,7 +117,14 @@ export const getNoteById = async (req, res, next) => {
 
 export const deleteNote = async (req, res, next) => {
   const { noteId } = req.params;
-  const userId = "";
+  const userId = req.user._id;
+
+  // Validate client's authorization
+  if (!userId) {
+    const error = new Error("Unauthorized - no user ID found");
+    error.status = 401;
+    return next(error);
+  }
 
   try {
     const note = await Note.findOne({ _id: noteId, userId: userId });
@@ -128,7 +149,14 @@ export const deleteNote = async (req, res, next) => {
 export const updateNote = async (req, res, next) => {
   const { noteId } = req.params;
   const { title, content, tags, isPinned } = req.body;
-  const userId = "";
+  const userId = req.user._id;
+
+  // Validate client's authorization
+  if (!userId) {
+    const error = new Error("Unauthorized - no user ID found");
+    error.status = 401;
+    return next(error);
+  }
 
   if (!title && !content && !tags && isPinned === undefined) {
     const error = new Error("No changes provided");

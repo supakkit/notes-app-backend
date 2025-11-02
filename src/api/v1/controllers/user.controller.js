@@ -65,7 +65,7 @@ export const login = async (req, res, next) => {
   }
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email, deleted: false });
 
     if (!user) {
       const error = new Error("Invalid credentials!");
@@ -151,7 +151,14 @@ export const logout = async (req, res, next) => {
 };
 
 export const deleteAccount = async (req, res, next) => {
-  const userId = "";
+  const userId = req.user._id;
+
+  // Validate client's authorization
+  if (!userId) {
+    const error = new Error("Unauthorized - no user ID found");
+    error.status = 401;
+    return next(error);
+  }
 
   try {
     const updatedUser = await User.findByIdAndUpdate(
