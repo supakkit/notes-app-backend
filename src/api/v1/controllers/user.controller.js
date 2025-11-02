@@ -14,10 +14,28 @@ export const signUp = async (req, res, next) => {
   try {
     const existingUser = await User.findOne({ email });
 
-    if (existingUser) {
+    if (existingUser && !existingUser.deleted) {
       const error = new Error("Email already in use!");
       error.status = 409;
       return next(error);
+    }
+
+    if (existingUser && existingUser.deleted) {
+      existingUser.fullName = fullName;
+      existingUser.password = password;
+      existingUser.deleted = false;
+      existingUser.deletedAt = null;
+
+      await existingUser.save();
+
+      const newUser = { ...existingUser._doc };
+      delete newUser.password;
+
+      return res.status(200).json({
+        error: false,
+        message: "Account reactivated successfully",
+        user: newUser,
+      });
     }
 
     const user = await User.create({ fullName, email, password });
@@ -126,6 +144,38 @@ export const logout = async (req, res, next) => {
     return res.status(200).json({
       error: false,
       message: "Logged out successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteAccount = async (req, res, next) => {
+  const userId = "";
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: { deleted: true, deletedAt: new Date() } },
+      { new: true } // return the updated document
+    );
+
+    if (!updatedUser) {
+      const error = new Error("User not found");
+      error.status = 404;
+      return next(error);
+    }
+
+    // Clear token in cookie
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+    });
+
+    return res.status(200).json({
+      error: false,
+      message: "User soft-deleted successfully",
     });
   } catch (err) {
     next(err);
