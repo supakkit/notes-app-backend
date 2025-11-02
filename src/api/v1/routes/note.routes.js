@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  answerQuestionByAI,
   createNote,
   deleteNote,
   getNoteById,
@@ -16,5 +17,6 @@ router.get("/notes/:noteId", getNoteById);
 router.delete("/notes/:noteId", deleteNote);
 router.patch("/notes/:noteId", updateNote);
 router.put("/notes/:noteId/visibility", togglePublicNote);
+router.post("/answer-question/:userId", answerQuestionByAI);
 
 export default router;

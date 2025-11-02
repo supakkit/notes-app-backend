@@ -8,6 +8,7 @@ const noteSchema = new Schema(
     isPinned: { type: Boolean, default: false },
     isPublic: { type: Boolean, default: false },
     userId: { type: Schema.Types.ObjectId, ref: "User", require: true },
+    embedding: { type: [Number], required: false },
   },
   { timestamps: true }
 );

@@ -1,5 +1,11 @@
+import generateEmbedding from "../../../utils/generateEmbedding.js";
 import Note from "../models/note.model.js";
 import User from "../models/user.model.js";
+import { OpenAI } from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 const parsePaginationParams = (query) => {
   const page = Math.max(1, parseInt(query.page, 10) || 1);
@@ -11,7 +17,13 @@ const parsePaginationParams = (query) => {
 };
 
 export const createNote = async (req, res, next) => {
-  const { title, content, tags = [] } = req.body;
+  const {
+    title,
+    content,
+    tags = [],
+    isPinned = false,
+    isPublic = false,
+  } = req.body;
   const userId = req.user._id;
 
   // Validate client's authorization
@@ -35,12 +47,29 @@ export const createNote = async (req, res, next) => {
   }
 
   try {
-    const note = await Note.create({ title, content, tags, userId });
+    // Generate embedding for the note
+    const embedding = await generateEmbedding(
+      `TITLE: ${title}. CONTENT: ${content}`
+    );
+
+    // Create a new note
+    const note = await Note.create({
+      title,
+      content,
+      tags,
+      isPinned,
+      isPublic,
+      userId,
+      embedding,
+    });
+
+    const newNote = { ...note._doc };
+    delete newNote.embedding;
 
     return res.status(201).json({
       error: false,
       message: "Note created successfully",
-      note,
+      note: newNote,
     });
   } catch (err) {
     next(err);
@@ -74,10 +103,18 @@ export const getUserNotes = async (req, res, next) => {
     const [total, notes] = await Promise.all([
       Note.countDocuments(filter),
       Note.find(filter)
+        .select("-embedding")
         .sort({ isPinned: -1, createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit),
     ]);
+
+    if (!notes) {
+      return res.status(200).json({
+        error: false,
+        message: "No matching notes found",
+      });
+    }
 
     return res.status(200).json({
       error: false,
@@ -104,7 +141,9 @@ export const getNoteById = async (req, res, next) => {
   }
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId });
+    const note = await Note.findOne({ _id: noteId, userId }).select(
+      "-embedding"
+    );
 
     if (!note) {
       const error = new Error("Note not found");
@@ -134,7 +173,9 @@ export const deleteNote = async (req, res, next) => {
   }
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId });
+    const note = await Note.findOne({ _id: noteId, userId }).select(
+      "-embedding"
+    );
 
     if (!note) {
       const error = new Error("Note not found");
@@ -182,15 +223,23 @@ export const updateNote = async (req, res, next) => {
 
     if (title !== undefined) note.title = title;
     if (content !== undefined) note.content = content;
+    if (title !== undefined || content !== undefined) {
+      note.embedding = await generateEmbedding(
+        `TITLE: ${note.title}. CONTENT: ${note.content}`
+      );
+    }
     if (tags !== undefined) note.tags = tags;
     if (isPinned !== undefined) note.isPinned = isPinned;
 
     const updatedNote = await note.save();
 
+    const returnedNote = { ...updatedNote._doc };
+    delete returnedNote.embedding;
+
     return res.status(200).json({
       error: false,
       message: "Note updated successfully",
-      note: updatedNote,
+      note: returnedNote,
     });
   } catch (err) {
     next(err);
@@ -214,7 +263,7 @@ export const togglePublicNote = async (req, res, next) => {
     const note = await Note.findOneAndUpdate(
       { _id: noteId, userId },
       { $set: { isPublic } },
-      { new: true }
+      { new: true, select: "-embedding" }
     );
 
     if (!note) {
@@ -252,6 +301,7 @@ export const getPublicNotesByUserId = async (req, res, next) => {
       User.findById(userId).select("fullName email -_id"),
       Note.countDocuments(filter),
       Note.find(filter)
+        .select("-embedding")
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit),
@@ -265,6 +315,66 @@ export const getPublicNotesByUserId = async (req, res, next) => {
       page,
       limit,
       total,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const answerQuestionByAI = async (req, res, next) => {
+  const { userId } = req.params;
+  const { question } = req.body;
+
+  try {
+    // Generate an embedding for the question
+    const questionEmbedding = await generateEmbedding(question);
+
+    const topNotes = await Note.aggregate([
+      {
+        $vectorSearch: {
+          index: "vector_index", // vector index name
+          queryVector: questionEmbedding,
+          path: "embedding", // embedding field name
+          numCandidates: 100, // number of candidates to consider
+          limit: 5, // number of results to return
+          filter: { userId, isPublic: true },
+        },
+      },
+      {
+        $project: {
+          title: 1,
+          content: 1,
+        },
+      },
+    ]);
+
+    // Create context from the notes
+    const context = topNotes
+      .map((note) => `TITLE: ${note.title}\nCONTENT: ${note.content}`)
+      .join("\n\n");
+
+    // Create prompt by using the context and the client's question
+    const prompt = `
+You are an AI assistant. Based on the noted below, answer the question.
+Notes:
+${context}
+
+Question: ${question}
+Answer:
+`;
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "You are an AI assistant." },
+        { role: "user", content: prompt },
+      ],
+      max_completion_tokens: 300,
+      temperature: 0.7,
+    });
+
+    return res.status(200).json({
+      error: false,
+      answer: response.choices[0].message.content.trim(),
     });
   } catch (err) {
     next(err);
