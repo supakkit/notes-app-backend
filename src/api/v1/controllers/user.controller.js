@@ -14,16 +14,16 @@ export const signUp = async (req, res, next) => {
   try {
     const existingUser = await User.findOne({ email });
 
-    if (existingUser && !existingUser.deleted) {
+    if (existingUser && !existingUser.isDeleted) {
       const error = new Error("Email already in use!");
       error.status = 409;
       return next(error);
     }
 
-    if (existingUser && existingUser.deleted) {
+    if (existingUser && existingUser.isDeleted) {
       existingUser.fullName = fullName;
       existingUser.password = password;
-      existingUser.deleted = false;
+      existingUser.isDeleted = false;
       existingUser.deletedAt = null;
 
       await existingUser.save();
@@ -65,7 +65,7 @@ export const login = async (req, res, next) => {
   }
 
   try {
-    const user = await User.findOne({ email, deleted: false });
+    const user = await User.findOne({ email, isDeleted: false });
 
     if (!user) {
       const error = new Error("Invalid credentials!");
@@ -163,7 +163,7 @@ export const deleteAccount = async (req, res, next) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { $set: { deleted: true, deletedAt: new Date() } },
+      { $set: { isDeleted: true, deletedAt: new Date() } },
       { new: true } // return the updated document
     );
 

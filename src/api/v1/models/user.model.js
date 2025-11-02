@@ -6,7 +6,7 @@ const userSchema = new Schema(
     fullName: { type: String, required: true },
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
-    deleted: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null }
   },
   { timestamps: true }
