@@ -3,7 +3,7 @@ import healthRoutes from "./routes/health.routes.js";
 import noteRoutes from "./routes/note.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import publicNoteRoutes from "./routes/public-note.routes.js";
-import { authUser } from "./middleware/auth.js";
+import { authUser } from "../../middleware/auth.js";
 
 const router = Router();
 

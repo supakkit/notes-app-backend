@@ -1,4 +1,11 @@
-const centralizedErrorHandler = async (err, req, res, next) => {
+import { ErrorRequestHandler } from "express";
+
+const centralizedErrorHandler: ErrorRequestHandler = async (
+  err,
+  req,
+  res,
+  next
+): Promise<void> => {
   const statusCode = err.status || 500;
   if (statusCode >= 500 && process.env.NODE_ENV !== "production") {
     console.error(err.stack);
