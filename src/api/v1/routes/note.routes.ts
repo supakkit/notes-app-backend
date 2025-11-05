@@ -11,7 +11,7 @@ import {
   createNoteBodySchema,
   getNotesQuerySchema,
   noteIdParamsSchema,
-  updatedNoteBodySchema,
+  updateNoteBodySchema,
 } from "../../../validators/note.validator.js";
 
 const router = Router();
@@ -40,7 +40,7 @@ router.patch(
   "/notes/:noteId",
   validateRequest({
     params: noteIdParamsSchema,
-    body: updatedNoteBodySchema,
+    body: updateNoteBodySchema,
   }),
   updateNote
 );

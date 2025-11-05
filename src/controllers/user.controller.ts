@@ -1,10 +1,9 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { Response, NextFunction, RequestHandler } from "express";
+import { RequestHandler } from "express";
 import { CreateUserBody, LoginBody } from "../validators/user.validator.js";
 import { CustomJwtPayload } from "../types/jwt.js";
-import { TypedRequest } from "../types/express.js";
 import { typedRequestHandler } from "../utils/typedRequestHandler.js";
 
 export const signUp = typedRequestHandler<{}, {}, CreateUserBody>(
@@ -58,9 +57,8 @@ export const login = typedRequestHandler<{}, {}, LoginBody>(
     const { email, password } = req.validatedBody;
 
     try {
-      const user = await User.findOne(
-        { email, isDeleted: false },
-        { password: 1 }
+      const user = await User.findOne({ email, isDeleted: false }).select(
+        "+password"
       );
 
       if (!user) {
@@ -92,14 +90,12 @@ export const login = typedRequestHandler<{}, {}, LoginBody>(
         maxAge: 3 * 60 * 60 * 1000, // 3 hour
       });
 
+      const { password: _pw, ...returnedUser } = user.toObject();
+
       res.status(200).json({
         error: false,
         message: "Login successfully",
-        user: {
-          _id: user._id,
-          fullName: user.fullName,
-          email: user.email,
-        },
+        user: returnedUser,
       });
     } catch (err) {
       next(err);

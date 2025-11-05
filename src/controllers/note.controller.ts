@@ -328,6 +328,7 @@ Answer:
 
     res.status(200).json({
       error: false,
+      message: "Generated answer successfully",
       answer: response.choices[0]?.message?.content?.trim(),
     });
   } catch (err) {

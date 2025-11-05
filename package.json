@@ -1,5 +1,5 @@
 {
-  "name": "react-notes-app-backend",
+  "name": "notes-app-backend",
   "version": "1.0.0",
   "description": "",
   "license": "ISC",
@@ -9,9 +9,10 @@
   "scripts": {
     "build": "tsc",
     "start": "node --env-file=.env dist/server.js",
-    "dev": "node --watch --env-file=.env dist/server.js"
+    "dev": "npx tsx --watch --env-file=.env src/server.ts"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.1.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -21,6 +22,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.2",
     "openai": "^6.7.0",
+    "swagger-ui-express": "^5.0.1",
     "zod": "^4.1.12"
   },
   "devDependencies": {
@@ -31,6 +33,9 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^24.10.0",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }
 }

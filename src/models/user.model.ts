@@ -17,7 +17,8 @@ const userSchema = new Schema(
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true, select: false },
     isDeleted: { type: Boolean, default: false },
-    deletedAt: { type: Date, default: null }
+    deletedAt: { type: Date, default: null },
+    __v: { type: Number, select: false },
   },
   { timestamps: true }
 );

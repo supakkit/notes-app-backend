@@ -22,7 +22,7 @@ const noteSchema = new Schema(
     userId: { type: Schema.Types.ObjectId, ref: "User", require: true },
     embedding: { type: [Number], required: false, select: false },
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 const Note = model<INote>("Note", noteSchema);

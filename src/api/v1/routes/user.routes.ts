@@ -14,7 +14,7 @@ const router = Router();
 
 router.post("/signup", validateRequest({ body: createUserBodySchema }), signUp);
 router.post("/login", validateRequest({ body: loginBodySchema }), login);
-router.get("/verify", verifyToken);
+router.get("/verify-token", verifyToken);
 router.post("/logout", logout);
 router.delete("/delete-account", authUser, deleteAccount);
 

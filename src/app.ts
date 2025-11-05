@@ -10,6 +10,8 @@ import centralizedErrorHandler from "./errors/centralizedErrorHandler.js";
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 // Global middleware
 app.use(helmet());
 app.use(cors(corsOptions));
