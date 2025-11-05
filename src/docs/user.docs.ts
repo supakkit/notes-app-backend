@@ -41,7 +41,7 @@ userRegistry.registerPath({
         "application/json": {
           schema: z.object({
             ...defaultResponseSchema.shape,
-            ...userResponseSchema.shape,
+            user: userResponseSchema,
           }),
         },
       },
@@ -81,7 +81,7 @@ userRegistry.registerPath({
         "application/json": {
           schema: z.object({
             ...defaultResponseSchema.shape,
-            ...userResponseSchema.shape,
+            user: userResponseSchema,
           }),
         },
       },
@@ -113,7 +113,7 @@ userRegistry.registerPath({
         "application/json": {
           schema: z.object({
             ...defaultResponseSchema.shape,
-            ...userIdParamsSchema.shape,
+            user: userResponseSchema,
           }),
         },
       },
@@ -197,7 +197,7 @@ userRegistry.registerPath({
         "application/json": {
           schema: z.object({
             ...defaultResponseSchema.shape,
-            ...userResponseSchema.shape,
+            user: userResponseSchema,
           }),
         },
       },
