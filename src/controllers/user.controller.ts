@@ -190,3 +190,35 @@ export const deleteAccount: RequestHandler = async (
     next(err);
   }
 };
+
+export const getUserProfile: RequestHandler = async (
+  req,
+  res,
+  next
+): Promise<void> => {
+  const userId = req.user?._id;
+
+  if (!userId) {
+    const error: CustomError = new Error("Unauthorized - no user ID found");
+    error.status = 401;
+    return next(error);
+  }
+
+  try {
+    const user = await User.findOne({ _id: userId, isDeleted: false });
+
+    if (!user) {
+      const error: CustomError = new Error("User not found");
+      error.status = 404;
+      return next(error);
+    }
+
+    res.status(200).json({
+      error: false,
+      message: "Retrieved user profile successfully",
+      user,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

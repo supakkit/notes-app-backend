@@ -182,3 +182,36 @@ userRegistry.registerPath({
     },
   },
 });
+
+// Registering the "Get User Profile" endpoint
+userRegistry.registerPath({
+  method: "get",
+  path: "/profile",
+  tags: ["User"],
+  summary: "Get the profile of the authenticated user",
+  description: "Retrieve the profile of the authenticated user",
+  responses: {
+    200: {
+      description: "Profile retrieved successfully",
+      content: {
+        "application/json": {
+          schema: z.object({
+            ...defaultResponseSchema.shape,
+            ...userResponseSchema.shape,
+          }),
+        },
+      },
+    },
+    401: {
+      description: "Access denied. No token.",
+    },
+    500: {
+      description: "Internal server error",
+      content: {
+        "application/json": {
+          schema: serverErrorResponseSchema,
+        },
+      },
+    },
+  },
+});

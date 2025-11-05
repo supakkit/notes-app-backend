@@ -6,7 +6,7 @@ export const userResponseSchema = z.object({
   fullName: z.string().openapi({ example: "John Doe" }),
   email: z.string().openapi({ example: "john.doe@example.com" }),
   isDeleted: z.boolean().default(false),
-  deletedAt: z.date().nullable(),
+  deletedAt: z.date().nullable().openapi({ example: "2023-11-01T12:00:00Z" }),
   createdAt: z.date().optional().openapi({ example: "2023-01-01T12:00:00Z" }),
   updatedAt: z.date().optional().openapi({ example: "2023-10-01T12:00:00Z" }),
 });

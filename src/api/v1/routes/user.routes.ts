@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   deleteAccount,
+  getUserProfile,
   login,
   logout,
   signUp,
@@ -16,6 +17,7 @@ router.post("/signup", validateRequest({ body: createUserBodySchema }), signUp);
 router.post("/login", validateRequest({ body: loginBodySchema }), login);
 router.get("/verify-token", verifyToken);
 router.post("/logout", logout);
+router.get("/profile", authUser, getUserProfile);
 router.delete("/delete-account", authUser, deleteAccount);
 
 export default router;
