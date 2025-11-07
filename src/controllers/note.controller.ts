@@ -335,3 +335,27 @@ Answer:
     next(err);
   }
 });
+
+export const getPublicNoteByNoteId = typedRequestHandler<NoteIdParams>(
+  async (req, res, next): Promise<void> => {
+    const { noteId } = req.validatedParams;
+
+    try {
+      const note = await Note.findOne({ _id: noteId, isPublic: true });
+
+      if (!note) {
+        const error: CustomError = new Error("Note not found");
+        error.status = 404;
+        return next(error);
+      }
+
+      res.status(200).json({
+        error: false,
+        message: "Note retrieved successfully",
+        note,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);

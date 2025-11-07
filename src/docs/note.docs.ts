@@ -143,10 +143,48 @@ noteRegistry.registerPath({
   },
 });
 
+// Registering the "Get Public Note by ID" endpoint
+noteRegistry.registerPath({
+  method: "get",
+  path: "/public-notes/:noteId",
+  tags: ["Notes"],
+  summary: "Get a public note by ID",
+  description: "Retrieve a public note by its ID",
+  request: {
+    params: noteIdParamsSchema,
+  },
+  responses: {
+    200: {
+      description: "Note retrieved successfully",
+      content: {
+        "application/json": {
+          schema: z.object({
+            ...defaultResponseSchema.shape,
+            notes: noteResponseSchema.extend({
+              isPublic: z.boolean().openapi({ example: true }),
+            }),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "Note not found",
+    },
+    500: {
+      description: "Internal server error",
+      content: {
+        "application/json": {
+          schema: serverErrorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
 // Registering the "Get Public Notes by user's ID" endpoint
 noteRegistry.registerPath({
   method: "get",
-  path: "/public-notes/:userId",
+  path: "/public-notes/user/:userId",
   tags: ["Notes"],
   summary: "Get public notes by user's ID",
   description: "Retrieve public notes by user's ID, for public access",
