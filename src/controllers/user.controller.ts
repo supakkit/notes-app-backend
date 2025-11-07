@@ -1,4 +1,4 @@
-import User from "../models/user.model.js";
+import User, { IUser } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { RequestHandler } from "express";
@@ -19,6 +19,10 @@ export const signUp = typedRequestHandler<{}, {}, CreateUserBody>(
         return next(error);
       }
 
+      let user: IUser;
+      let statusCode: number;
+      let responseMessage: string;
+
       if (existingUser && existingUser.isDeleted) {
         existingUser.fullName = fullName;
         existingUser.password = password;
@@ -26,24 +30,43 @@ export const signUp = typedRequestHandler<{}, {}, CreateUserBody>(
         existingUser.deletedAt = null;
 
         await existingUser.save();
+        user = existingUser;
+        statusCode = 200;
+        responseMessage = "Account reactivated successfully";
+        // const { password: _pw, ...restoredUser } = existingUser.toObject();
 
-        const { password: _pw, ...restoredUser } = existingUser.toObject();
-
-        res.status(200).json({
-          error: false,
-          message: "Account reactivated successfully",
-          user: restoredUser,
-        });
-        return;
+        // res.status(200).json({
+        //   error: false,
+        //   message: "Account reactivated successfully",
+        //   user: restoredUser,
+        // });
+        // return;
+      } else {
+        user = await User.create({ fullName, email, password });
+        statusCode = 201;
+        responseMessage = "Create a new user successfully";
       }
 
-      const user = await User.create({ fullName, email, password });
+      // Generate token
+      const secret = process.env.JWT_SECRET as jwt.Secret;
+      const token = jwt.sign({ userId: user._id }, secret, {
+        expiresIn: "3h",
+      });
+
+      // Set token in cookie
+      res.cookie("accessToken", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // only send over HTTPS in production
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        path: "/",
+        maxAge: 3 * 60 * 60 * 1000, // 3 hour
+      });
 
       const { password: _pw, ...newUser } = user.toObject();
 
-      res.status(201).json({
+      res.status(statusCode).json({
         error: false,
-        message: "Create a new user successfully",
+        message: responseMessage,
         user: newUser,
       });
     } catch (err) {
