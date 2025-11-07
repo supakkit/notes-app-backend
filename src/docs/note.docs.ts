@@ -315,7 +315,7 @@ noteRegistry.registerPath({
 // Registering the "Answer Question by AI" endpoint
 noteRegistry.registerPath({
   method: "post",
-  path: "/notes/:userId/answer-question",
+  path: "/answer-question/:userId",
   tags: ["Notes"],
   summary: "Answer a question using AI based on notes",
   description:
