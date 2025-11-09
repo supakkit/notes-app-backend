@@ -5,11 +5,11 @@ export const noteResponseSchema = z.object({
   _id: z.uuid().openapi({ example: "6909a5a4032da33efd9b5243" }),
   title: z
     .string()
-    .min(1, { message: "Title is required" })
-    .openapi({ example: "Example Note Title" }),
+    .min(1, { message: "Title is required." })
+    .openapi({ example: "Example Note Title." }),
   content: z
     .string()
-    .min(1, { message: "Content is required" })
+    .min(1, { message: "Content is required." })
     .openapi({ example: "This is the content of the example note." }),
   tags: z
     .array(z.string())
@@ -26,12 +26,12 @@ export const noteResponseSchema = z.object({
 export const createNoteBodySchema = z
   .object({
     title: z
-      .string()
-      .min(1, "Title is required")
+      .string("Title is required.")
+      .min(1, "Title is too short.")
       .openapi({ example: "My Note" }),
     content: z
-      .string()
-      .min(1, "Content is required")
+      .string("Content is required.")
+      .min(1, "Content is too short.")
       .openapi({ example: "This is my note's content." }),
     tags: z
       .array(z.string())
@@ -48,8 +48,8 @@ export type CreateNoteBody = z.infer<typeof createNoteBodySchema>;
 // Validation schema for updating note
 export const updateNoteBodySchema = z
   .object({
-    title: z.string().min(1).optional().openapi({ example: "My Updated Note" }),
-    content: z.string().min(1).optional(),
+    title: z.string("Title is required.").min(1, "Title is too short.").optional().openapi({ example: "My Updated Note" }),
+    content: z.string("Content is required.").min(1, "Title is too short.").optional(),
     tags: z.array(z.string()).optional(),
     isPinned: z.boolean().optional(),
     isPublic: z.boolean().optional(),
@@ -109,7 +109,7 @@ export const noteIdParamsSchema = z
 export type NoteIdParams = z.infer<typeof noteIdParamsSchema>;
 
 export const answerQuestionBodySchema = z.object({
-  question: z.string("Question is required").min(5, "Too short!"),
+  question: z.string("Question is required.").min(5, "Question is too short."),
 });
 
 export type AnswerQuestionBody = z.infer<typeof answerQuestionBodySchema>;

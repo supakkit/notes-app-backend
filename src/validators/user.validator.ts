@@ -24,28 +24,20 @@ export const userIdParamsSchema = z.object({
 export type UserIdParams = z.infer<typeof userIdParamsSchema>;
 
 export const createUserBodySchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  email: z.email("Invalid email address"),
+  fullName: z.string("Full name is required.").min(1, "Full name is too short."),
+  email: z.email("Invalid email address."),
   password: z
-    .string()
-    .min(6, "Password must contain at least 6 characters")
-    .regex(/[A-Za-z0-9]/, {
-      message: "Password must contain at least one letter and one number",
-    })
-    .openapi({ example: "PWD123" }),
+    .string("Password is required.")
+    .min(6, "Password must contain at least 6 characters."),
 });
 
 export type CreateUserBody = z.infer<typeof createUserBodySchema>;
 
 export const loginBodySchema = z.object({
-  email: z.email("Invalid email address"),
+  email: z.email("Invalid email address."),
   password: z
-    .string()
-    .min(6, "Password must contain at least 6 characters")
-    .regex(/[A-Za-z0-9]/, {
-      message: "Password must contain at least one letter and one number",
-    })
-    .openapi({ example: "PWD123" }),
+    .string("Password is required.")
+    .min(6, "Password must contain at least 6 characters."),
 });
 
 export type LoginBody = z.infer<typeof loginBodySchema>;
