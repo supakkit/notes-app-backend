@@ -1,4 +1,4 @@
-import { beforeAll, afterAll, afterEach } from "vitest";
+import { beforeAll, afterAll, afterEach, vi } from "vitest";
 import {
   cleanUpCollections,
   startMongoServer,
@@ -7,6 +7,8 @@ import {
 
 beforeAll(async () => {
   await startMongoServer();
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  vi.spyOn(console, "warn").mockImplementation(() => {});
 });
 
 afterEach(async () => {
