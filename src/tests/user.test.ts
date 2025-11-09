@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 
 const mockAuthFn = vi.hoisted(() =>
   vi.fn((req: Request, _res: Response, next: NextFunction) => {
-    req.user = { _id: new mongoose.Types.ObjectId().toString() };
+    req.user = { _id: new mongoose.Types.ObjectId() };
     next();
   })
 );
@@ -174,7 +174,7 @@ describe("User Routes: DELETE /delete-account (auth required)", () => {
     mockAuthFn.mockReset();
 
     mockAuthFn.mockImplementation((req, _res, next) => {
-      req.user = { _id: createdUserId.toString() };
+      req.user = { _id: createdUserId };
       next();
     });
   });
@@ -225,7 +225,7 @@ describe("User Routes: GET /profile (auth required)", async () => {
     mockAuthFn.mockReset();
 
     mockAuthFn.mockImplementation((req, _res, next) => {
-      req.user = { _id: createdUserId.toString() };
+      req.user = { _id: createdUserId };
       next();
     });
   });

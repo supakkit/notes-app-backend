@@ -5,6 +5,7 @@ import { RequestHandler } from "express";
 import { CreateUserBody, LoginBody } from "../validators/user.validator.js";
 import { CustomJwtPayload } from "../types/jwt.js";
 import { typedRequestHandler } from "../utils/typedRequestHandler.js";
+import mongoose from "mongoose";
 
 export const signUp = typedRequestHandler<{}, {}, CreateUserBody>(
   async (req, res, next): Promise<void> => {
@@ -49,7 +50,7 @@ export const signUp = typedRequestHandler<{}, {}, CreateUserBody>(
 
       // Generate token
       const secret = process.env.JWT_SECRET as jwt.Secret;
-      const token = jwt.sign({ userId: user._id }, secret, {
+      const token = jwt.sign({ userId: user._id as mongoose.Types.ObjectId }, secret, {
         expiresIn: "3h",
       });
 
@@ -100,7 +101,7 @@ export const login = typedRequestHandler<{}, {}, LoginBody>(
 
       // Generate token
       const secret = process.env.JWT_SECRET as jwt.Secret;
-      const token = jwt.sign({ userId: user._id }, secret, {
+      const token = jwt.sign({ userId: user._id as mongoose.Types.ObjectId }, secret, {
         expiresIn: "3h",
       });
 
