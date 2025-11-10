@@ -1,13 +1,14 @@
 import app from "./app.js";
 import connectMongo from "./config/mongo.js";
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 4000;
+const HOST = "0.0.0.0";
 
 async function startServer() {
   try {
     await connectMongo();
 
-    app.listen(PORT, () => {
+    app.listen(PORT, HOST, () => {
       console.log(`Notes App Server running on Port: ${PORT}`);
     });
   } catch (err) {
