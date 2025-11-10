@@ -7,8 +7,8 @@
   "type": "module",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node --env-file=.env dist/server.js",
+    "build": "npm install --include=dev && tsc",
+    "start": "node dist/server.js",
     "dev": "npx tsx --watch --env-file=.env src/server.ts",
     "test": "vitest run"
   },
