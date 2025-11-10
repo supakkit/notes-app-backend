@@ -287,7 +287,7 @@ noteRegistry.registerPath({
     params: noteIdParamsSchema,
   },
   responses: {
-    204: {
+    200: {
       description: "Note deleted successfully",
       content: {
         "application/json": {

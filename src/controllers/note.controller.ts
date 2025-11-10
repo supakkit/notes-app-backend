@@ -160,7 +160,7 @@ export const deleteNote = typedRequestHandler<NoteIdParams>(
 
       await note.deleteOne();
 
-      res.status(204).json({
+      res.status(200).json({
         error: false,
         message: "Note deleted successfully",
       });
